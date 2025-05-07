@@ -1,0 +1,85 @@
+<apex:page controller="CalculatorController" sidebar="false" showHeader="true">
+    <apex:pageMessages id="messages"/>
+    <apex:form id="form">
+        <apex:pageBlock title="Simple Calculator">
+            <apex:pageBlockSection columns="1">
+                <apex:outputLabel value="Enter First Number:" />
+                <apex:inputText value="{!num1}" required="true" style="width:200px" html-inputtype="number"/>
+
+                <apex:outputLabel value="Enter Second Number:" />
+                <apex:inputText value="{!num2}" required="true" style="width:200px" html-inputtype="number"/>
+
+                <apex:outputLabel value="Select Operation:" />
+                <apex:selectList value="{!operation}" size="1">
+                    <apex:selectOption itemValue="add" itemLabel="Addition (+)"/>
+                    <apex:selectOption itemValue="subtract" itemLabel="Subtraction (-)"/>
+                    <apex:selectOption itemValue="multiply" itemLabel="Multiplication (*)"/>
+                    <apex:selectOption itemValue="divide" itemLabel="Division (/)"/>
+                </apex:selectList>
+
+                <apex:outputLabel value="Result:" />
+                <apex:outputPanel id="resultPanel">
+                    <apex:outputText value="{!result}" style="font-weight:bold; font-size:14px"/>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Calculate" action="{!calculate}" rerender="messages,form"/>
+                <apex:commandButton value="Clear" action="{!clear}" rerender="messages,form"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
+
+
+
+
+
+
+
+public class CalculatorController {
+    public Decimal num1 { get; set; }
+    public Decimal num2 { get; set; }
+    public String operation { get; set; }
+    public Decimal result { get; set; }
+
+    public CalculatorController() {
+        num1 = 0;
+        num2 = 0;
+        operation = 'add';
+        result = 0;
+    }
+
+    public void calculate() {
+        try {
+            System.debug('Calculate called: num1=' + num1 + ', num2=' + num2 + ', operation=' + operation);
+            if (operation == 'divide' && num2 == 0) {
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Cannot divide by zero'));
+                return;
+            }
+
+            if (operation == 'add') {
+                result = num1 + num2;
+            } else if (operation == 'subtract') {
+                result = num1 - num2;
+            } else if (operation == 'multiply') {
+                result = num1 * num2;
+            } else if (operation == 'divide') {
+                result = num1 / num2;
+            }
+
+            System.debug('Result calculated: ' + result);
+        } catch (Exception e) {
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Error in calculation: ' + e.getMessage()));
+            System.debug('Error in calculate: ' + e.getMessage());
+        }
+    }
+
+    public void clear() {
+        num1 = 0;
+        num2 = 0;
+        operation = 'add';
+        result = 0;
+        System.debug('Clear called');
+    }
+}
